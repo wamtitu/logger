@@ -4,6 +4,8 @@ const express = require('express');
 const mongoose = require('mongoose')
 const bodyParser = require('body-parser');
 const userRouter = require('./userRouter');
+const menuRouter = require('./menuRouter');
+
 const { response } = require('express');
 
 const app = express();
@@ -30,6 +32,8 @@ app.get('/testing',(req,resp)=>{
 })
 
 app.use('/api/v1/users', userRouter);
+app.use('/api/v1/menu', menuRouter);
+
 
 const port = 3000;
 app.listen(port, ()=>{

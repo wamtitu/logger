@@ -1,4 +1,5 @@
 //const express = require('express')
+const {promisify } = require('util');
 const jwt = require('jsonwebtoken');
 const mongoose = require('mongoose');
 const User = require('./userModel');
@@ -68,3 +69,25 @@ exports.login = async(req, res, next)=>{
         Token
     });
 };
+exports.protect = catchAsync(async(req, res, next)=>{
+   //checking if there is a token
+   let token;
+   if(req.headers.authorization && req.headers.authorization.startsWith('Bearer'))
+   {
+    token = req.headers.authorization.split(' ')[1];
+   };
+
+   if(!token){
+    return next(new AppError('you are not logged in, please log in to gain access'))
+   }
+   //verfying the token
+   const decodedToken = await promisify(jwt.verify)(token, JWT_SECRET);
+   console.log(decodedToken);
+   //checking if user dtill exists
+    const freshUser = await User.findById(decodedToken.id);
+    if(!freshUser){
+        return next(new AppError('the user belonging to this token nolonger exist'))
+    }
+
+    next();
+});
